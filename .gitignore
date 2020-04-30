@@ -1,0 +1,12 @@
+*.iml
+.gradle
+.idea
+/local.properties
+/keystore.properties
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+app/build
+app/src/generated
+/lib_superplayer
