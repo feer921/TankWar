@@ -10,6 +10,6 @@ object Config {
     val blockPix = 64
 
     val gameWindowW = blockPix * 13
-    val gameWindowH = blockPix * 13
+    val gameWindowH = blockPix * 10
 
 }

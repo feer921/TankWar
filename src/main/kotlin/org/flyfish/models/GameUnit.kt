@@ -14,6 +14,25 @@ import org.itheima.kotlin.game.core.Painter
  */
 open class GameUnit(override var x: Int, override var y: Int) : IDrawable {
 
+    protected val TAG = javaClass.simpleName
+
+    /**
+     * 游戏单元所在的行
+     * 注：从 下标 0开始
+     */
+    var rowOfUnit = 0
+
+    /**
+     * 游戏单元所在 列
+     * 注：从下标 0 开始
+     */
+    var columnOfUnit = 0
+
+    /**
+     * 游戏单元 的名称
+     */
+    var gameUnitName: String? = null
+
     val UNIT_TYPE_TANK = 10
     val UNIT_TYPE_GRASS = UNIT_TYPE_TANK + 1
     val UNIT_TYPE_WATER_WALL = UNIT_TYPE_GRASS + 1
@@ -42,6 +61,25 @@ open class GameUnit(override var x: Int, override var y: Int) : IDrawable {
 
     fun setGameUnitType(unitType: Int) {
         this.unitType = unitType;
+        this.gameUnitName = when (unitType) {
+            UNIT_TYPE_BRICK_WALL -> "砖墙"
+            UNIT_TYPE_GRASS ->"草墙"
+            UNIT_TYPE_IRON_WALL ->"铁墙"
+            UNIT_TYPE_TANK ->"坦克"
+            UNIT_TYPE_WATER_WALL ->"水墙"
+            else -> null
+        }
+    }
+
+    override fun toString(): String {
+        return "GameUnit(rowOfUnit=$rowOfUnit, columnOfUnit=$columnOfUnit, gameUnitName=$gameUnitName, unitType=$unitType)"
+    }
+
+
+    fun drawImage(imgPath: String?, x: Int, y: Int) {
+        imgPath?.let {
+            Painter.drawImage(imgPath, x, y)
+        }
     }
 
 }

@@ -30,9 +30,21 @@ interface IDrawable {
      */
     fun draw()
 
+    fun checkCollision(x1:Int,y1:Int,w1:Int,h1:Int,x2:Int,y2:Int,w2:Int,h2:Int):Boolean{
+        return  when {
+            y2 + h2<= y1 ->
+                false
+            y1 + h1 <=y2 ->
+                false
+            x2 + w2 <= x1 ->
+                false
+            else -> x1 + w1>x2
+        }
+    }
+
     /**
      * 绘制时，检测 需要绘制的元素之间是否 绘制冲突(绘制的边缘重叠)了
-     *
+     * Kotlin 特性，接口也可以实现接口方法
      */
     fun checkDrawCollision(
         unit1X: Int,
@@ -48,7 +60,7 @@ interface IDrawable {
             unit2X + unit2W <= unit1X -> false //第二个在第一个元素的X轴左侧
             unit2Y + unit2H <= unit1Y -> false //第二个在第一个元素的Y轴上方
             unit2Y >= unit1Y + unit1H -> false //第二个在第一个元素的Y+高后Y轴下方
-            else -> unit2X > unit1X + unit1W
+            else -> unit2X < unit1X + unit1W //???
         }
     }
 
