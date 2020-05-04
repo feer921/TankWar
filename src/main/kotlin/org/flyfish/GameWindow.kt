@@ -75,9 +75,16 @@ class GameWindow : Window("Tank-War", "img/s1.png", Config.gameWindowW, Config.g
             lineIndex ++
         }
 
-        myTank = Tank(Config.blockPix * 12, Config.blockPix * 10)
+        myTank = Tank(Config.blockPix * 12, Config.blockPix * 9)
         views.add(myTank)
         //TODO 添加 大本营
+    }
+
+    private fun buildMyTanks(){
+        if(myTank.isCanDestroyed){
+            myTank = Tank(Config.blockPix * 12, Config.blockPix * 9)
+            views.add(myTank)
+        }
     }
 
     override fun onDisplay() {
@@ -103,9 +110,16 @@ class GameWindow : Window("Tank-War", "img/s1.png", Config.gameWindowW, Config.g
             KeyCode.LEFT -> direction = Direction.LEFT
             KeyCode.RIGHT -> direction = Direction.RIGHT
             KeyCode.D -> direction = Direction.RIGHT
+            KeyCode.R ->{
+                buildMyTanks()
+            }
             KeyCode.SPACE ->{
-                val sendABullet = myTank.shot()
-                views.add(sendABullet)
+                if (!myTank.isCanDestroyed) {
+                    val sendABullet = myTank.shot()
+                    sendABullet ?.let {
+                        views.add(sendABullet)
+                    }
+                }
             }
         }
         if (direction != null) {
@@ -135,14 +149,23 @@ class GameWindow : Window("Tank-War", "img/s1.png", Config.gameWindowW, Config.g
             moveUnit as IMovable
             var conflictDirection: Direction? = null
             var theConflictBockableUnit : IBlockable ? = null
-            views.filter { (it is IBlockable) and (moveUnit != it)  }.forEach Tag@{blockUnit ->
+            views.filter { (it is IBlockable) and (moveUnit != it)  }.forEach Tag@{ blockUnit ->
                 blockUnit as IBlockable
-                conflictDirection = moveUnit.willMoveConflict(blockUnit)
-                conflictDirection?.let {
-                    theConflictBockableUnit = blockUnit
-                     return@Tag
+                if (blockUnit.isCanBlock()) {
+                    val curBadDirection = moveUnit.willMoveConflict(blockUnit)
+                    curBadDirection?.let {
+                        conflictDirection = curBadDirection
+                        theConflictBockableUnit = blockUnit
+                        return@Tag
+                    }
                 }
-            }
+                //下面的逻辑错误
+//                conflictDirection = moveUnit.willMoveConflict(blockUnit)
+//                conflictDirection?.let {
+//                    theConflictBockableUnit = blockUnit
+//                     return@Tag
+//                }
+            }//遍历完成 所有的可阻塞单元
             moveUnit.notifyMoveConflict(conflictDirection, theConflictBockableUnit)
         }
 
@@ -156,7 +179,8 @@ class GameWindow : Window("Tank-War", "img/s1.png", Config.gameWindowW, Config.g
         //检测 可以攻击的游戏元素
         views.filterIsInstance<IAttackable>().forEach { attackableUnit ->
             attackableUnit as IAttackable
-            views.filterIsInstance<ISufferable>().forEach sufferTag@ /** 放置一个标记 **/{sufferableUnit ->
+            //攻击单元 的发动者 不能攻击自己
+            views.filter { (it is ISufferable) and (it != attackableUnit.curAttackPromoter) }.forEach sufferTag@ /** 放置一个标记 **/{sufferableUnit ->
                 sufferableUnit as ISufferable
                 if (attackableUnit.isHappenAttack(sufferableUnit)) {
                     val attachDrawable = attackableUnit.attack(sufferableUnit)
@@ -165,6 +189,13 @@ class GameWindow : Window("Tank-War", "img/s1.png", Config.gameWindowW, Config.g
                     }
                     return@sufferTag
                 }
+            }
+        }
+        //检测可自动 射击的游戏单元
+        views.filterIsInstance<IAutoShotable>().forEach {
+            val autoShotOutView = it.autoShot()
+            autoShotOutView?.let {
+                views.add(autoShotOutView)
             }
         }
     }

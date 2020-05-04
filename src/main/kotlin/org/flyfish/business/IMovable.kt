@@ -11,7 +11,7 @@ interface IMovable : IDrawable{
     /**
      * 所具有的移动速度
      */
-    val speed: Int
+    var speed: Int
 
 
     /**
@@ -19,6 +19,10 @@ interface IMovable : IDrawable{
      */
     val curDirection : Direction
 
+    /**
+     * 定义 可移动 的单元 移动时将要碰到与障碍物冲突的 方向
+     */
+    var willConflictDirection : Direction ?
 
     /**
      * 判断是否将要 移动冲突了
@@ -33,7 +37,7 @@ interface IMovable : IDrawable{
             Direction.LEFT -> curX -= speed
             Direction.RIGHT -> curX += speed
         }
-        //游戏边界
+        //先检测游戏边界
         if (curX < 0) {
             return Direction.LEFT
         }
@@ -66,7 +70,9 @@ interface IMovable : IDrawable{
      * @param directionOfConflict 当前移动冲突的方向
      * @param blockable 当前的阻碍物
      */
-    fun notifyMoveConflict(directionOfConflict: Direction?, blockable: IBlockable?)
+    fun notifyMoveConflict(directionOfConflict: Direction?, blockable: IBlockable?){
+        this.willConflictDirection = directionOfConflict
+    }
 
 
     /**
@@ -94,6 +100,11 @@ interface IMovable : IDrawable{
         if (y + height > Config.gameWindowH) {
             y = Config.gameWindowH - height
         }
+    }
+
+
+    fun setMoveSpeed(theMoveSpeed: Int){
+        this.speed = theMoveSpeed
     }
 
 }

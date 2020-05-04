@@ -54,12 +54,12 @@ open class GameUnit(override var x: Int, override var y: Int) : IDrawable {
             else -> null
         }
         if (unitImgPath != null) {
-            Painter.drawImage(unitImgPath, x, y)
+            drawImage(unitImgPath, x, y)
         }
     }
 
 
-    fun setGameUnitType(unitType: Int) {
+    open fun setGameUnitType(unitType: Int) {
         this.unitType = unitType;
         this.gameUnitName = when (unitType) {
             UNIT_TYPE_BRICK_WALL -> "砖墙"
@@ -72,7 +72,7 @@ open class GameUnit(override var x: Int, override var y: Int) : IDrawable {
     }
 
     override fun toString(): String {
-        return "GameUnit(rowOfUnit=$rowOfUnit, columnOfUnit=$columnOfUnit, gameUnitName=$gameUnitName, unitType=$unitType)"
+        return "$TAG(rowOfUnit=$rowOfUnit, columnOfUnit=$columnOfUnit, gameUnitName=$gameUnitName, unitType=$unitType)"
     }
 
 

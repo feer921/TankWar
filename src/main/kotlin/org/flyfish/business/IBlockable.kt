@@ -8,4 +8,9 @@ import org.flyfish.models.IDrawable
  */
 interface IBlockable : IDrawable {
 
+    /**
+     * 定义接口方法：当前可 阻塞物是否 能阻塞
+     */
+    fun isCanBlock(): Boolean = true
+
 }

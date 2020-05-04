@@ -9,6 +9,17 @@ import org.flyfish.models.IDrawable
 interface IAttackable : IDrawable {
 
     /**
+     * 定义可变 属性：表示 本次攻击的发动者
+     */
+    var curAttackPromoter: IDrawable?
+
+    fun setAttackPromotern(attackPromoter: IDrawable?){
+        this.curAttackPromoter = attackPromoter
+    }
+    fun getAttackPromoter(): IDrawable?{
+        return this.curAttackPromoter
+    }
+    /**
      * 表示 可攻击者的攻击力量值
      */
     var attackPowerValue: Int //接口里不能初始化
@@ -26,4 +37,6 @@ interface IAttackable : IDrawable {
     fun attack(sufferableUnit: ISufferable): Array<IDrawable>? {
         return sufferableUnit.onSufferAttack(this)
     }
+
+
 }

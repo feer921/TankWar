@@ -25,6 +25,10 @@ class Wall(x: Int,y: Int) : GameUnit(x,y),IBlockable,ISufferable,IDestroyAble{
      * 接口方法：表示正在遭遇 攻击
      */
     override fun onSufferAttack(theIAttackable: IAttackable): Array<IDrawable>? {
+        if (unitType == UNIT_TYPE_GRASS || unitType == UNIT_TYPE_WATER_WALL) {
+            //草墙、水墙，不 遭受 攻击
+            return null
+        }
         val attackPowerValue = theIAttackable.attackPowerValue
         lifeValue -= attackPowerValue
         Composer.play("snd/hit.wav")
@@ -34,8 +38,20 @@ class Wall(x: Int,y: Int) : GameUnit(x,y),IBlockable,ISufferable,IDestroyAble{
         return arrayOf(blastView)
     }
 
+    /**
+     * 定义接口方法：当前可 阻塞物是否 能阻塞
+     */
+    override fun isCanBlock(): Boolean {
+        if (unitType == UNIT_TYPE_GRASS) {//草墙不阻挡可运动的单元
+            return false
+        }
+        return super.isCanBlock()
+    }
 
-
-
-
+    override fun setGameUnitType(unitType: Int) {
+        super.setGameUnitType(unitType)
+        if (unitType == UNIT_TYPE_IRON_WALL) {//如果是 铁墙，则生命值为 5
+            lifeValue = 5
+        }
+    }
 }

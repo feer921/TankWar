@@ -1,9 +1,10 @@
 package org.flyfish.models
 
-import org.flyfish.business.IBlockable
-import org.flyfish.business.IMovable
+import org.flyfish.business.*
+import org.itheima.kotlin.game.core.Composer
+import sun.rmi.runtime.Log
 
-open class Tank(x: Int, y: Int) : GameUnit(x,y),IMovable,IBlockable{
+open class Tank(x: Int, y: Int) : GameUnit(x,y),IMovable,IBlockable,IDestroyAble,ISufferable{
     /**
      * 所有的移动速度
      */
@@ -17,9 +18,13 @@ open class Tank(x: Int, y: Int) : GameUnit(x,y),IMovable,IBlockable{
     /**
      * 将要移动 冲突的方向
      */
-    var willConflictDirection: Direction? = null
+    override var willConflictDirection: Direction? = null
 
 
+    /**
+     * 定义变量：当前是否能被销毁
+     */
+    override var isCanDestroyed: Boolean = false
     /**
      * 主动的移动
      */
@@ -35,6 +40,9 @@ open class Tank(x: Int, y: Int) : GameUnit(x,y),IMovable,IBlockable{
         moveFollowDirection()
     }
 
+
+
+
     override fun draw() {
 //        println("$TAG -> draw() curDirection = $curDirection")
         val tankImgPath: String = when (curDirection) {
@@ -46,46 +54,45 @@ open class Tank(x: Int, y: Int) : GameUnit(x,y),IMovable,IBlockable{
         drawImage(tankImgPath, x, y)
     }
 
-    /**
-     * 通知 当前移动 (碰到 阻碍物)冲突了
-     * @param directionOfConflict 当前移动冲突的方向
-     * @param blockable 当前的阻碍物
-     */
-    override fun notifyMoveConflict(directionOfConflict: Direction?, blockable: IBlockable?) {
-        this.willConflictDirection = directionOfConflict
-    }
+    private var lastShotTime : Long = 0
+    private var theShotTimeGap : Long = 600
 
-    fun shot(): Bullet {
-//        return Bullet(this.curDirection) { bulletWidth, bulletHeight ->
-//            var theBulletX = this.x
-//            var theBulletY = this.y
-//            //要根据当前坦克的方向来确定 子弹的方向
-//            val halfWidthOfTank = this.width / 2
-//            val halfHeightOfTank = this.height / 2
-//
-//            when (this.curDirection) {
-//                Direction.UP -> {
-//                    //如果坦克的方向为 上，则子弹的 X应该是 坦克的X加上一半的坦克宽 - 子弹的半宽
-//                    theBulletX += halfWidthOfTank - bulletWidth / 2
-//                    theBulletY -= bulletHeight / 2
-//                }
-//                Direction.LEFT ->{
-//                    theBulletX -= bulletWidth / 2
-//                    theBulletY += halfHeightOfTank - bulletHeight / 2
-//                }
-//                Direction.RIGHT ->{
-//                    theBulletX += this.width + bulletWidth / 2
-//                    theBulletY += halfHeightOfTank - bulletHeight / 2
-//                }
-//                Direction.DOWN ->{
-//                    theBulletX += halfWidthOfTank - bulletWidth / 2
-//                    theBulletY += this.height - bulletHeight / 2
-//                }
-//            }
-//            Pair(theBulletX,theBulletY)
-//        }
+    /**
+     * 发射 子弹
+     */
+    fun shot(): Bullet? {
+        val curTime = System.currentTimeMillis()
+        if (curTime - lastShotTime < theShotTimeGap) {
+            return null
+        }
+        lastShotTime = curTime
         val bullet = Bullet(curDirection)
         bullet.configLocation(this)
+        bullet.setAttackPromotern(this)
         return bullet
+    }
+
+
+    /**
+     * 表示 遭受 单元的生命值
+     * 实现类 各自赋值
+     */
+    override var lifeValue: Int = 5
+
+    /**
+     * 接口方法：表示正在遭遇 攻击
+     */
+    override fun onSufferAttack(theIAttackable: IAttackable): Array<IDrawable>? {
+        if (theIAttackable.getAttackPromoter() == this) {
+            //如果子弹 是我自己发出去的，则不 遭受攻击
+            return null
+        }
+        val attackPowerValue = theIAttackable.attackPowerValue
+        lifeValue -= attackPowerValue
+        Composer.play("snd/hit.wav")
+        isCanDestroyed = lifeValue <= 0
+        val blastView = BlastView(x,y)
+        blastView.blastViewType = 1
+        return arrayOf(blastView)
     }
 }

@@ -1,7 +1,9 @@
 package org.flyfish.models
 
-import org.flyfish.business.*
-import org.flyfish.ext.checkDrawCollision
+import org.flyfish.business.IAttackable
+import org.flyfish.business.IAutoMovable
+import org.flyfish.business.IDestroyAble
+import org.flyfish.business.ISufferable
 import org.itheima.kotlin.game.core.Painter
 
 /**
@@ -23,9 +25,20 @@ class Bullet(override var curDirection: Direction) : GameUnit(0,0),IAutoMovable,
     override val height: Int
 
     /**
+     * 定义 可移动 的单元 移动时将要碰到与障碍物冲突的 方向
+     */
+    override var willConflictDirection: Direction? = null
+
+    /**
      * 定义变量：当前是否能被销毁
      */
     override var isCanDestroyed: Boolean = false
+
+    /**
+     * 定义可变 属性：表示 本次攻击的发动者
+     */
+    override var curAttackPromoter: IDrawable? = null
+
     /**
      * 表示 可攻击者的攻击力量值
      */
@@ -50,11 +63,7 @@ class Bullet(override var curDirection: Direction) : GameUnit(0,0),IAutoMovable,
     }
 
     override fun draw() {
-        Painter.drawImage(imgPath, x, y)
-    }
-
-    override fun notifyMoveConflict(directionOfConflict: Direction?, blockable: IBlockable?) {
-        //TODO
+        drawImage(imgPath, x, y)
     }
 
 
