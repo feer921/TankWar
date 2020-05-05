@@ -22,7 +22,7 @@ fun calcuRate(terms: Int, totalMoney: Double, repaymentMoneyPerMonth: Double) {
 
     //每月利息： 每月还款总额 - 每月本金
     val interestPerMonth = repaymentMoneyPerMonth - capitalPerMonth
-
+    println("每月 利息: $interestPerMonth")
     //算出每月利率
     val rate = interestPerMonth/totalMoney
 
@@ -46,6 +46,7 @@ fun calcuPerMonthMoney(terms: Int, totalMoney: Double, rate: Double) {
     //每月利息： 贷款总金额 * 已知贷款利率
     val interestPerMonth = totalMoney * rate
 
+    println("每月利息：$interestPerMonth")
     //算出每月还款 总额
 
     println("每月还款总额: ${capitalPerMonth + interestPerMonth}")
